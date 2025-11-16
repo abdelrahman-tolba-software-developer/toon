@@ -1,0 +1,17 @@
+name: toon_example
+description: Example Flutter app using TOON format
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  toon_formater:
+    path: ../toon_formater
+
+dev_dependencies:
+  build_runner: ^2.4.0
+  toon_dart_generator:
+    path: ../toon_dart_generator
+

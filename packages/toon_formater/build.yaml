@@ -1,0 +1,16 @@
+targets:
+  $default:
+    builders:
+      toon_formater|toon_generator:
+        enabled: true
+        generate_for:
+          - lib/**/*.dart
+
+builders:
+  toon_generator:
+    import: "package:toon_formater/src/generator/builder.dart"
+    builder_factories: ["toonGenerator"]
+    build_extensions: {".dart": [".g.dart"]}
+    auto_apply: dependents
+    build_to: source
+
