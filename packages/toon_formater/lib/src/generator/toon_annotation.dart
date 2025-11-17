@@ -25,4 +25,3 @@ class ToonField {
     this.include = true,
   });
 }
-

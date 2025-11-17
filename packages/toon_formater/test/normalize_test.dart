@@ -134,7 +134,12 @@ void main() {
         expect(isArrayOfObjects([]), isTrue);
         final emptyMap = <String, Object?>{};
         expect(isArrayOfObjects([emptyMap]), isTrue);
-        expect(isArrayOfObjects([{'a': 1}, {'b': 2}]), isTrue);
+        expect(
+            isArrayOfObjects([
+              {'a': 1},
+              {'b': 2}
+            ]),
+            isTrue);
         expect(isArrayOfObjects([1, 2, 3]), isFalse);
         expect(isArrayOfObjects(['a', 'b']), isFalse);
         // Note: Normalized arrays with maps may have different generic types
@@ -143,4 +148,3 @@ void main() {
     });
   });
 }
-

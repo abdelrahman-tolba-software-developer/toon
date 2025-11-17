@@ -30,4 +30,3 @@ class LineWriter {
     return _lines.join('\n');
   }
 }
-

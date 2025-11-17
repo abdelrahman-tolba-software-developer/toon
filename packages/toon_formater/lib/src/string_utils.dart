@@ -39,7 +39,8 @@ String unescapeString(String value) {
   while (i < value.length) {
     if (value[i] == backslash) {
       if (i + 1 >= value.length) {
-        throw const FormatException('Invalid escape sequence: backslash at end of string');
+        throw const FormatException(
+            'Invalid escape sequence: backslash at end of string');
       }
 
       final next = value[i + 1];
@@ -120,4 +121,3 @@ int findUnquotedChar(String content, String char, [int start = 0]) {
 
   return -1;
 }
-

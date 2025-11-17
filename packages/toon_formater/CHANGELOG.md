@@ -8,7 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 📦 [Pub.dev Package](https://pub.dev/packages/toon_formater)
 - 🐙 [GitHub Repository](https://github.com/abdelrahman-tolba-software-developer/toon)
 
-## [1.0.0] - 2024-01-XX
+## [1.0.2] - 2025-01-XX
+
+### Fixed
+- Updated dependencies to latest compatible versions
+- Fixed repository URL to point to package directory
+- Improved documentation for code generation methods
+
+## [1.0.1] - 2025-01-XX
+
+### Fixed
+- Fixed unnecessary cast warnings in tabular array encoding
+- Added `.pubignore` to exclude test output files
+
+## [1.0.0] - 2025-01-XX
 
 ### Added
 - Initial release of TOON formatter for Dart/Flutter

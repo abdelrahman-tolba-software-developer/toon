@@ -9,4 +9,3 @@ Builder toonGenerator(BuilderOptions options) {
     '.toon.g.dart',
   );
 }
-

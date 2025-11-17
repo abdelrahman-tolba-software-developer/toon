@@ -106,4 +106,3 @@ ScanResult toParsedLines(String source, int indentSize, bool strict) {
 int _computeDepthFromIndent(int indentSpaces, int indentSize) {
   return indentSpaces ~/ indentSize;
 }
-

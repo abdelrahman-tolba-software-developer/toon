@@ -57,10 +57,7 @@ JsonValue normalizeValue(Object? value) {
 
 // Type guards
 bool isJsonPrimitive(Object? value) {
-  return value == null ||
-      value is String ||
-      value is num ||
-      value is bool;
+  return value == null || value is String || value is num || value is bool;
 }
 
 bool isJsonArray(Object? value) {
@@ -87,4 +84,3 @@ bool isArrayOfArrays(JsonArray value) {
 bool isArrayOfObjects(JsonArray value) {
   return value.isEmpty || value.every((item) => isJsonObject(item));
 }
-

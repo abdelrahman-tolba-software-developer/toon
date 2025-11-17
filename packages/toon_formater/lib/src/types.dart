@@ -86,4 +86,3 @@ class BlankLineInfo {
     required this.depth,
   });
 }
-

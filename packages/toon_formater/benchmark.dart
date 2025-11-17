@@ -93,7 +93,8 @@ void main() {
 
   print('JSON size: ${smallJsonString.length} bytes');
   print('Toon size: ${smallToonString.length} bytes');
-  print('Size ratio: ${(smallToonString.length / smallJsonString.length * 100).toStringAsFixed(1)}%');
+  print(
+      'Size ratio: ${(smallToonString.length / smallJsonString.length * 100).toStringAsFixed(1)}%');
 
   JsonEncodeBenchmark(smallData).report();
   ToonEncodeBenchmark(smallData).report();
@@ -106,13 +107,15 @@ void main() {
 
   // Medium data benchmark
   final mediumData = {
-    'users': List.generate(10, (i) => {
-      'id': i,
-      'name': 'User $i',
-      'age': 20 + i,
-      'email': 'user$i@example.com',
-      'active': i % 2 == 0,
-    }),
+    'users': List.generate(
+        10,
+        (i) => {
+              'id': i,
+              'name': 'User $i',
+              'age': 20 + i,
+              'email': 'user$i@example.com',
+              'active': i % 2 == 0,
+            }),
     'metadata': {
       'total': 10,
       'page': 1,
@@ -126,7 +129,8 @@ void main() {
 
   print('JSON size: ${mediumJsonString.length} bytes');
   print('Toon size: ${mediumToonString.length} bytes');
-  print('Size ratio: ${(mediumToonString.length / mediumJsonString.length * 100).toStringAsFixed(1)}%');
+  print(
+      'Size ratio: ${(mediumToonString.length / mediumJsonString.length * 100).toStringAsFixed(1)}%');
 
   JsonEncodeBenchmark(mediumData).report();
   ToonEncodeBenchmark(mediumData).report();
@@ -139,19 +143,23 @@ void main() {
 
   // Large data benchmark
   final largeData = {
-    'products': List.generate(100, (i) => {
-      'id': i,
-      'name': 'Product $i',
-      'price': 9.99 + i * 0.1,
-      'description': 'This is a detailed description for product $i',
-      'category': 'Category ${i % 5}',
-      'inStock': i % 3 != 0,
-      'tags': List.generate(5, (j) => 'tag${i}_$j'),
-      'reviews': List.generate(3, (j) => {
-        'rating': 3 + (i + j) % 3,
-        'comment': 'Review $j for product $i',
-      }),
-    }),
+    'products': List.generate(
+        100,
+        (i) => {
+              'id': i,
+              'name': 'Product $i',
+              'price': 9.99 + i * 0.1,
+              'description': 'This is a detailed description for product $i',
+              'category': 'Category ${i % 5}',
+              'inStock': i % 3 != 0,
+              'tags': List.generate(5, (j) => 'tag${i}_$j'),
+              'reviews': List.generate(
+                  3,
+                  (j) => {
+                        'rating': 3 + (i + j) % 3,
+                        'comment': 'Review $j for product $i',
+                      }),
+            }),
     'summary': {
       'total': 100,
       'averagePrice': 14.99,
@@ -165,7 +173,8 @@ void main() {
 
   print('JSON size: ${largeJsonString.length} bytes');
   print('Toon size: ${largeToonString.length} bytes');
-  print('Size ratio: ${(largeToonString.length / largeJsonString.length * 100).toStringAsFixed(1)}%');
+  print(
+      'Size ratio: ${(largeToonString.length / largeJsonString.length * 100).toStringAsFixed(1)}%');
 
   JsonEncodeBenchmark(largeData).report();
   ToonEncodeBenchmark(largeData).report();
@@ -181,7 +190,7 @@ void main() {
     final hardfile = File('test/hardfile.json');
     if (hardfile.existsSync()) {
       var hardfileJsonString = hardfile.readAsStringSync();
-      
+
       // Pre-process JSON to handle NaN and Infinity (not valid JSON)
       var processedJson = hardfileJsonString
           .replaceAll(': NaN', ': null')
@@ -189,31 +198,31 @@ void main() {
           .replaceAll(': -Infinity', ': null')
           .replaceAll('"NaN"', 'null')
           .replaceAll('"Infinity"', 'null');
-      
+
       // Escape control characters in string literals
       final buffer = StringBuffer();
       bool inString = false;
       int backslashCount = 0;
-      
+
       for (int i = 0; i < processedJson.length; i++) {
         final char = processedJson[i];
         final codeUnit = char.codeUnitAt(0);
-        
+
         if (char == '\\') {
           backslashCount++;
           buffer.write(char);
           continue;
         }
-        
+
         final isEscaped = (backslashCount % 2) == 1;
         backslashCount = 0;
-        
+
         if (char == '"' && !isEscaped) {
           inString = !inString;
           buffer.write(char);
           continue;
         }
-        
+
         if (inString && !isEscaped && codeUnit >= 0 && codeUnit < 32) {
           switch (char) {
             case '\t':
@@ -238,17 +247,19 @@ void main() {
           buffer.write(char);
         }
       }
-      
+
       processedJson = buffer.toString();
       hardfileJsonString = processedJson;
-      final hardfileData = jsonDecode(hardfileJsonString) as Map<String, dynamic>;
+      final hardfileData =
+          jsonDecode(hardfileJsonString) as Map<String, dynamic>;
 
       print('\n--- Real-World Data (hardfile.json) ---');
       final hardfileToonString = encode(hardfileData);
 
       print('JSON size: ${hardfileJsonString.length} bytes');
       print('Toon size: ${hardfileToonString.length} bytes');
-      print('Size ratio: ${(hardfileToonString.length / hardfileJsonString.length * 100).toStringAsFixed(1)}%');
+      print(
+          'Size ratio: ${(hardfileToonString.length / hardfileJsonString.length * 100).toStringAsFixed(1)}%');
 
       JsonEncodeBenchmark(hardfileData).report();
       ToonEncodeBenchmark(hardfileData).report();
@@ -271,4 +282,3 @@ void main() {
 
   print('\n$separator');
 }
-

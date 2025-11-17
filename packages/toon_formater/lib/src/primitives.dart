@@ -46,7 +46,7 @@ String encodeAndJoinPrimitives(
 ) {
   if (values.isEmpty) return '';
   if (values.length == 1) return encodePrimitive(values[0], delimiter);
-  
+
   final buffer = StringBuffer();
   final delim = delimiter.value;
   buffer.write(encodePrimitive(values[0], delimiter));
@@ -71,8 +71,7 @@ String formatHeader(
   }
 
   // Only include delimiter if it's not the default (comma)
-  final delimiterStr =
-      delimiter != defaultDelimiter ? delimiter.value : '';
+  final delimiterStr = delimiter != defaultDelimiter ? delimiter.value : '';
   buffer.write('[$length$delimiterStr]');
 
   if (fields != null && fields.isNotEmpty) {
@@ -90,4 +89,3 @@ String formatHeader(
 
   return buffer.toString();
 }
-

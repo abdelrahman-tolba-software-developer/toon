@@ -45,7 +45,7 @@ void _encodeObject(
   for (int i = 0; i < entries.length; i++) {
     final entry = entries[i];
     _encodeKeyValuePair(entry.key, entry.value, writer, depth, options);
-    
+
     // Add blank line between top-level entries (depth 0)
     if (depth == 0 && i < entries.length - 1) {
       writer.push(0, '');
@@ -163,7 +163,7 @@ List<String>? _extractTabularHeaderOptimized(JsonArray value) {
       }
     }
   }
-  
+
   return firstKeys;
 }
 
@@ -208,7 +208,8 @@ void _encodeMixedArrayAsListItems(
   int depth,
   EncodeOptions options,
 ) {
-  final header = formatHeader(items.length, key: prefix, delimiter: options.delimiter);
+  final header =
+      formatHeader(items.length, key: prefix, delimiter: options.delimiter);
   writer.push(depth, header);
 
   for (final item in items) {
@@ -262,7 +263,7 @@ void _encodeObjectAsListItem(
   } else if (isJsonArray(firstEntry.value)) {
     // Handle array in list item
     final arr = firstEntry.value as JsonArray;
-    
+
     // Check if it's an array of objects that can be tabular
     if (isArrayOfObjects(arr)) {
       final tabularHeader = _extractTabularHeaderOptimized(arr);
@@ -276,7 +277,7 @@ void _encodeObjectAsListItem(
           delimiter: options.delimiter,
         );
         writer.pushListItem(depth, formattedHeader);
-        
+
         // Encode tabular rows
         for (final row in objects) {
           final values = tabularHeader.map((key) {
@@ -290,7 +291,8 @@ void _encodeObjectAsListItem(
             // ignore: unnecessary_cast
             return value as JsonPrimitive;
           }).toList();
-          final joinedValue = encodeAndJoinPrimitives(values, options.delimiter);
+          final joinedValue =
+              encodeAndJoinPrimitives(values, options.delimiter);
           writer.push(depth + 1, joinedValue);
         }
       } else {
@@ -329,7 +331,8 @@ void _encodeObjectAsListItem(
 
   // Remaining entries
   for (int i = 1; i < entries.length; i++) {
-    _encodeKeyValuePair(entries[i].key, entries[i].value, writer, depth + 1, options);
+    _encodeKeyValuePair(
+        entries[i].key, entries[i].value, writer, depth + 1, options);
   }
 }
 
@@ -339,4 +342,3 @@ JsonValue _decodeValue(String input, DecodeOptions options) {
   // For now, return empty object
   return <String, Object?>{};
 }
-

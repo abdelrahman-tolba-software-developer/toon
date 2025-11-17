@@ -68,4 +68,3 @@ bool _isNumericLike(String value) {
           .hasMatch(value) ||
       RegExp(r'^0\d+$').hasMatch(value);
 }
-

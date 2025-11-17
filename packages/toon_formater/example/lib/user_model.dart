@@ -26,4 +26,3 @@ class User {
   // String toToon();
   // static User fromToon(String toon);
 }
-

@@ -146,13 +146,18 @@ void main() {
       });
 
       test('encodes array with key', () {
-        final result = encode({'users': [1, 2, 3]});
+        final result = encode({
+          'users': [1, 2, 3]
+        });
         expect(result, contains('users[3]:'));
         expect(result, contains('1,2,3'));
       });
 
       test('encodes nested arrays', () {
-        final result = encode([[1, 2], [3, 4]]);
+        final result = encode([
+          [1, 2],
+          [3, 4]
+        ]);
         expect(result, contains('[2]:'));
       });
     });
@@ -207,7 +212,9 @@ void main() {
     group('EncodeOptions', () {
       test('uses custom indent', () {
         final result = encode(
-          {'a': {'b': 'c'}},
+          {
+            'a': {'b': 'c'}
+          },
           EncodeOptions(indent: 4),
         );
         expect(result, contains('    ')); // 4 spaces
@@ -411,4 +418,3 @@ void main() {
     });
   });
 }
-

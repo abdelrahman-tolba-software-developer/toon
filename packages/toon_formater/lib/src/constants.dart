@@ -38,4 +38,3 @@ enum Delimiter {
 }
 
 const Delimiter defaultDelimiter = Delimiter.comma;
-

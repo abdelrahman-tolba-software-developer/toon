@@ -37,7 +37,8 @@ void main() {
       // String with spaces may or may not be quoted depending on validation
       final result = encodeStringLiteral('hello world', Delimiter.comma);
       expect(result, anyOf(equals('"hello world"'), equals('hello world')));
-      expect(encodeStringLiteral('say "hello"', Delimiter.comma), equals('"say \\"hello\\""'));
+      expect(encodeStringLiteral('say "hello"', Delimiter.comma),
+          equals('"say \\"hello\\""'));
     });
 
     test('encodeKey quotes when needed', () {
@@ -118,4 +119,3 @@ void main() {
     });
   });
 }
-

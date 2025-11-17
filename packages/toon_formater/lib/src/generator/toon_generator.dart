@@ -30,10 +30,11 @@ class ToonGenerator extends GeneratorForAnnotation<ToonSerializable> {
     final generateFromToon = annotation.read('generateFromToon').boolValue;
 
     final buffer = StringBuffer();
-    
+
     // Generate only the helper class - user will add delegation methods manually
     final helperClassName = '_${classElement.name}ToonGenerated';
-    buffer.writeln(_generateHelperClass(classElement, helperClassName, generateToToon, generateFromToon));
+    buffer.writeln(_generateHelperClass(
+        classElement, helperClassName, generateToToon, generateFromToon));
 
     return buffer.toString();
   }
@@ -48,7 +49,7 @@ class ToonGenerator extends GeneratorForAnnotation<ToonSerializable> {
     final buffer = StringBuffer();
 
     buffer.writeln('class $helperClassName {');
-    
+
     if (generateToToon) {
       buffer.writeln('  static String toToon($className instance) {');
       buffer.writeln('    final map = <String, Object?>{};');
@@ -118,7 +119,6 @@ class ToonGenerator extends GeneratorForAnnotation<ToonSerializable> {
     return buffer.toString();
   }
 
-
   List<FieldElement> _getSerializableFields(ClassElement classElement) {
     return classElement.fields
         .where((field) => !field.isStatic && !field.isPrivate)
@@ -150,4 +150,3 @@ extension TypeExtension on DartType {
   bool get isDartCoreList => element?.name == 'List';
   bool get isDartCoreMap => element?.name == 'Map';
 }
-

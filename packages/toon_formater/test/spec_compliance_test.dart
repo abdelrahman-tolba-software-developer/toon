@@ -41,28 +41,31 @@ void main() {
       };
 
       final result = encode(data);
-      
+
       // Verify structure matches spec
       expect(result, contains('context:'));
       expect(result, contains('task: Our favorite hikes together'));
       expect(result, contains('location: Boulder'));
       expect(result, contains('season: spring_2025'));
-      
+
       // Verify blank line between top-level entries
       expect(result, contains('spring_2025\n\nfriends'));
-      
+
       // Verify primitive array format
       expect(result, contains('friends[3]: ana,luis,sam'));
-      
+
       // Verify blank line before hikes
       expect(result, contains('sam\n\nhikes'));
-      
+
       // Verify tabular array format
-      expect(result, contains('hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:'));
+      expect(
+          result,
+          contains(
+              'hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:'));
       expect(result, contains('1,Blue Lake Trail,7.5,320,ana,true'));
       expect(result, contains('2,Ridge Overlook,9.2,540,luis,false'));
       expect(result, contains('3,Wildflower Loop,5.1,180,sam,true'));
-      
+
       print('=== Spec Compliance Test Output ===');
       print(result);
       print('=== End ===');
@@ -77,14 +80,15 @@ void main() {
       };
 
       // Test comma delimiter (default - should not show delimiter in header)
-      final commaResult = encode(data, EncodeOptions(delimiter: Delimiter.comma));
+      final commaResult =
+          encode(data, EncodeOptions(delimiter: Delimiter.comma));
       expect(commaResult, contains('items[2]{sku,qty,price}:'));
       expect(commaResult, isNot(contains('items[2,]{')));
 
       // Test tab delimiter (should show delimiter in header)
       final tabResult = encode(data, EncodeOptions(delimiter: Delimiter.tab));
       expect(tabResult, contains('items[2\t]{sku\tqty\tprice}:'));
-      
+
       // Test pipe delimiter (should show delimiter in header)
       final pipeResult = encode(data, EncodeOptions(delimiter: Delimiter.pipe));
       expect(pipeResult, contains('items[2|]{sku|qty|price}:'));
@@ -93,15 +97,13 @@ void main() {
     test('verifies 2-space indentation (spec requirement)', () {
       final data = {
         'nested': {
-          'deep': {
-            'value': 'test'
-          }
+          'deep': {'value': 'test'}
         }
       };
 
       final result = encode(data);
       final lines = result.split('\n');
-      
+
       // Verify indentation
       expect(lines[0], equals('nested:'));
       expect(lines[1], equals('  deep:'));
@@ -118,4 +120,3 @@ void main() {
     });
   });
 }
-
