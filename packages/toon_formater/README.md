@@ -2,6 +2,13 @@
 
 Token-Oriented Object Notation (TOON) – A compact, deterministic JSON format for LLM prompts (Dart/Flutter implementation).
 
+[![pub.dev](https://img.shields.io/pub/v/toon_formater)](https://pub.dev/packages/toon_formater)
+[![GitHub](https://img.shields.io/github/stars/abdelrahman-tolba-software-developer/toon)](https://github.com/abdelrahman-tolba-software-developer/toon)
+
+- 📦 [Pub.dev Package](https://pub.dev/packages/toon_formater)
+- 🐙 [GitHub Repository](https://github.com/abdelrahman-tolba-software-developer/toon)
+- 📖 [TOON Specification](https://toonformat.dev)
+
 ## Installation
 
 Add to your `pubspec.yaml`:
@@ -155,7 +162,7 @@ TOON is a compact, human-readable encoding of JSON data:
 - **Arrays**: Inline for primitives, tabular for uniform objects
 - **Primitives**: Strings, numbers, booleans, null
 
-See the [TOON specification](https://github.com/toon-format/spec) for complete details.
+See the [TOON specification](https://toonformat.dev) for complete details.
 
 ## Performance Benchmarks
 
@@ -189,6 +196,12 @@ Run benchmarks yourself:
 ```bash
 dart run lib/benchmark.dart
 ```
+
+## Links
+
+- 📦 [Pub.dev Package](https://pub.dev/packages/toon_formater)
+- 🐙 [GitHub Repository](https://github.com/abdelrahman-tolba-software-developer/toon)
+- 📖 [TOON Specification](https://toonformat.dev)
 
 ## License
 
