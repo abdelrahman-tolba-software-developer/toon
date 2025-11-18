@@ -17,7 +17,7 @@ The similarity to CSV is intentional: CSV is simple and ubiquitous, and TOON aim
 Think of it as a translation layer: use JSON programmatically, and encode it as TOON for LLM input.
 
 > [!TIP]
-> TOON is production-ready, but also an idea in progress. Nothing's set in stone – help shape where it goes by contributing to the [spec](https://github.com/toon-format/spec) or sharing feedback.
+> The TOON format is stable, but also an idea in progress. Nothing's set in stone – help shape where it goes by contributing to the [spec](https://github.com/toon-format/spec) or sharing feedback.
 
 ## Table of Contents
 
@@ -29,9 +29,8 @@ Think of it as a translation layer: use JSON programmatically, and encode it as 
 - [Playgrounds](#playgrounds)
 - [CLI](#cli)
 - [Format Overview](#format-overview)
-- [API](#api)
-- [Using TOON in LLM Prompts](#using-toon-in-llm-prompts)
-- [Syntax Cheatsheet](#syntax-cheatsheet)
+- [Using TOON with LLMs](#using-toon-with-llms)
+- [Documentation](#documentation)
 - [Other Implementations](#other-implementations)
 - [📋 Full Specification](https://github.com/toon-format/spec/blob/main/SPEC.md)
 
@@ -115,14 +114,12 @@ hikes:
 
 TOON conveys the same information with **even fewer tokens** – combining YAML-like indentation with CSV-style tabular arrays:
 
-```toon
+```yaml
 context:
   task: Our favorite hikes together
   location: Boulder
   season: spring_2025
-
 friends[3]: ana,luis,sam
-
 hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
   1,Blue Lake Trail,7.5,320,ana,true
   2,Ridge Overlook,9.2,540,luis,false
@@ -131,14 +128,12 @@ hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
 
 ## Key Features
 
-- 💸 **Token-efficient:** typically 30-60% fewer tokens on large uniform arrays vs formatted JSON[^1]
-- 🤿 **LLM-friendly guardrails:** explicit lengths and fields enable validation
-- 🍱 **Minimal syntax:** removes redundant punctuation (braces, brackets, most quotes)
-- 📐 **Indentation-based structure:** like YAML, uses whitespace instead of braces
-- 🧺 **Tabular arrays:** declare keys once, stream data as rows
-- 🔗 **Optional key folding:** collapses single-key wrapper chains into dotted paths (e.g., `data.metadata.items`) to reduce indentation and tokens
-
-[^1]: For flat tabular data, CSV is more compact. TOON adds minimal overhead to provide explicit structure and validation that improves LLM reliability.
+- 📊 **Token-Efficient & Accurate:** TOON reaches 74% accuracy (vs JSON's 70%) while using ~40% fewer tokens in mixed-structure benchmarks across 4 models.
+- 🔁 **JSON Data Model:** Encodes the same objects, arrays, and primitives as JSON with deterministic, lossless round-trips.
+- 🛤️ **LLM-Friendly Guardrails:** Explicit [N] lengths and {fields} headers give models a clear schema to follow, improving parsing reliability.
+- 📐 **Minimal Syntax:** Uses indentation instead of braces and minimizes quoting, giving YAML-like readability with CSV-style compactness.
+- 🧺 **Tabular Arrays:** Uniform arrays of objects collapse into tables that declare fields once and stream row values line by line.
+- 🌐 **Multi-Language Ecosystem:** Spec-driven implementations in TypeScript, Python, Go, Rust, .NET, and other languages.
 
 ## When Not to Use TOON
 
@@ -249,7 +244,8 @@ grok-4-fast-non-reasoning
   CSV            ██████████░░░░░░░░░░    52.3% (57/109)
 ```
 
-**Key tradeoff:** TOON achieves **73.9% accuracy** (vs JSON's 69.7%) while using **39.6% fewer tokens** on these datasets.
+> [!TIP] Results Summary
+> TOON achieves **73.9% accuracy** (vs JSON's 69.7%) while using **39.6% fewer tokens** on these datasets.
 
 <details>
 <summary><strong>Performance by dataset, model, and question type</strong></summary>
@@ -302,11 +298,11 @@ grok-4-fast-non-reasoning
 
 | Format | Accuracy | Tokens | Correct/Total |
 | ------ | -------- | ------ | ------------- |
-| `toon` | 62.9% | 8,780 | 83/132 |
-| `csv` | 61.4% | 8,528 | 81/132 |
-| `yaml` | 59.8% | 13,142 | 79/132 |
-| `json-compact` | 55.3% | 11,465 | 73/132 |
-| `json-pretty` | 56.1% | 15,158 | 74/132 |
+| `toon` | 62.9% | 8,779 | 83/132 |
+| `csv` | 61.4% | 8,527 | 81/132 |
+| `yaml` | 59.8% | 13,141 | 79/132 |
+| `json-compact` | 55.3% | 11,464 | 73/132 |
+| `json-pretty` | 56.1% | 15,157 | 74/132 |
 | `xml` | 48.5% | 17,105 | 64/132 |
 
 ##### Semi-uniform event logs
@@ -432,12 +428,9 @@ grok-4-fast-non-reasoning
 
 </details>
 
-<details>
-<summary><strong>How the benchmark works</strong></summary>
-
 #### What's Being Measured
 
-This benchmark tests **LLM comprehension and data retrieval accuracy** across different input formats. Each LLM receives formatted data and must answer questions about it (this does **not** test model's ability to generate TOON output).
+This benchmark tests **LLM comprehension and data retrieval accuracy** across different input formats. Each LLM receives formatted data and must answer questions about it. This does **not** test the model's ability to generate TOON output – only to read and understand it.
 
 #### Datasets Tested
 
@@ -453,7 +446,7 @@ Eleven datasets designed to test different structural patterns and validation ca
 
 **Structural validation datasets:**
 7. **Control**: Valid complete dataset (baseline for validation)
-8. **Truncated**: Array with 3 rows removed from end (tests [N] length detection)
+8. **Truncated**: Array with 3 rows removed from end (tests `[N]` length detection)
 9. **Extra rows**: Array with 3 additional rows beyond declared length
 10. **Width mismatch**: Inconsistent field count (missing salary in row 10)
 11. **Missing fields**: Systematic field omissions (no email in multiple rows)
@@ -476,14 +469,14 @@ Eleven datasets designed to test different structural patterns and validation ca
   - Example: "How many employees in Sales have salary > 80000?" → `5`
   - Example: "How many active employees have more than 10 years of experience?" → `8`
 
-- **Structure awareness (12%)**: Tests format-native structural affordances (TOON's [N] count and {fields}, CSV's header row)
+- **Structure awareness (12%)**: Tests format-native structural affordances (TOON's `[N]` count and `{fields}`, CSV's header row)
   - Example: "How many employees are in the dataset?" → `100`
   - Example: "List the field names for employees" → `id, name, email, department, salary, yearsExperience, active`
   - Example: "What is the department of the last employee?" → `Sales`
 
 - **Structural validation (2%)**: Tests ability to detect incomplete, truncated, or corrupted data using structural metadata
   - Example: "Is this data complete and valid?" → `YES` (control dataset) or `NO` (corrupted datasets)
-  - Tests TOON's [N] length validation and {fields} consistency checking
+  - Tests TOON's `[N]` length validation and `{fields}` consistency checking
   - Demonstrates CSV's lack of structural validation capabilities
 
 #### Evaluation Process
@@ -498,8 +491,6 @@ Eleven datasets designed to test different structural patterns and validation ca
 - **Token counting**: Using `gpt-tokenizer` with `o200k_base` encoding (GPT-5 tokenizer)
 - **Temperature**: Not set (models use their defaults)
 - **Total evaluations**: 209 questions × 6 formats × 4 models = 5,016 LLM calls
-
-</details>
 
 <!-- /automd -->
 
@@ -737,7 +728,7 @@ npx @toon-format/cli input.json -o output.toon
 echo '{"name": "Ada", "role": "dev"}' | npx @toon-format/cli
 ```
 
-See [CLI section](#cli) for all options and examples.
+See the [CLI section](#cli) for all options and examples.
 
 ### TypeScript Library
 
@@ -774,22 +765,12 @@ console.log(encode(data))
 
 Experiment with TOON format interactively using these community-built tools for token comparison, format conversion, and validation:
 
-- **[Format Tokenization Playground](https://www.curiouslychase.com/playground/format-tokenization-exploration)**
-- **[TOON Tools](https://toontools.vercel.app/)**
+- [Format Tokenization Playground](https://www.curiouslychase.com/playground/format-tokenization-exploration)
+- [TOON Tools](https://toontools.vercel.app/)
 
 ## CLI
 
-Command-line tool for converting between JSON and TOON formats.
-
-### Usage
-
-```bash
-npx @toon-format/cli [options] [input]
-```
-
-**Standard input:** Omit the input argument or use `-` to read from stdin. This enables piping data directly from other commands.
-
-**Auto-detection:** The CLI automatically detects the operation based on file extension (`.json` → encode, `.toon` → decode). When reading from stdin, use `--encode` or `--decode` flags to specify the operation (defaults to encode).
+Command-line tool for quick JSON↔TOON conversions, token analysis, and pipeline integration. Auto-detects format from file extension, supports stdin/stdout workflows, and offers delimiter options for maximum efficiency.
 
 ```bash
 # Encode JSON to TOON (auto-detected)
@@ -798,516 +779,52 @@ npx @toon-format/cli input.json -o output.toon
 # Decode TOON to JSON (auto-detected)
 npx @toon-format/cli data.toon -o output.json
 
-# Output to stdout
-npx @toon-format/cli input.json
-
 # Pipe from stdin (no argument needed)
 cat data.json | npx @toon-format/cli
 echo '{"name": "Ada"}' | npx @toon-format/cli
 
-# Explicit stdin with hyphen (equivalent to above)
-cat data.json | npx @toon-format/cli -
+# Output to stdout
+npx @toon-format/cli input.json
 
-# Decode from stdin
-cat data.toon | npx @toon-format/cli --decode
+# Show token savings
+npx @toon-format/cli data.json --stats
 ```
 
-### Options
-
-| Option | Description |
-| ------ | ----------- |
-| `-o, --output <file>` | Output file path (prints to stdout if omitted) |
-| `-e, --encode` | Force encode mode (overrides auto-detection) |
-| `-d, --decode` | Force decode mode (overrides auto-detection) |
-| `--delimiter <char>` | Array delimiter: `,` (comma), `\t` (tab), `\|` (pipe) |
-| `--indent <number>` | Indentation size (default: `2`) |
-| `--stats` | Show token count estimates and savings (encode only) |
-| `--no-strict` | Disable strict validation when decoding |
-| `--key-folding <mode>` | Key folding mode: `off`, `safe` (default: `off`) - collapses nested chains |
-| `--flatten-depth <number>` | Maximum segments to fold (default: `Infinity`) - requires `--key-folding safe` |
-| `--expand-paths <mode>` | Path expansion mode: `off`, `safe` (default: `off`) - reconstructs dotted keys |
-
-### Examples
-
-```bash
-# Show token savings when encoding
-npx @toon-format/cli data.json --stats -o output.toon
-
-# Tab-separated output (often more token-efficient)
-npx @toon-format/cli data.json --delimiter "\t" -o output.toon
-
-# Pipe-separated output
-npx @toon-format/cli data.json --delimiter "|" -o output.toon
-
-# Lenient decoding (skip validation)
-npx @toon-format/cli data.toon --no-strict -o output.json
-
-# Key folding for nested data
-npx @toon-format/cli data.json --key-folding safe -o output.toon
-
-# Stdin workflows
-echo '{"name": "Ada", "age": 30}' | npx @toon-format/cli --stats
-cat large-dataset.json | npx @toon-format/cli --delimiter "\t" > output.toon
-```
+> [!TIP]
+> See the full [CLI documentation](https://toonformat.dev/cli/) for all options, examples, and advanced usage.
 
 ## Format Overview
 
-> [!NOTE]
-> For precise formatting rules and implementation details, see the [full specification](https://github.com/toon-format/spec).
+Detailed syntax references, implementation guides, and quick lookups for understanding and using the TOON format.
 
-### Objects
+- [Format Overview](https://toonformat.dev/guide/format-overview) – Complete syntax documentation
+- [Syntax Cheatsheet](https://toonformat.dev/reference/syntax-cheatsheet) – Quick reference
+- [API Reference](https://toonformat.dev/reference/api) – Encode/decode usage (TypeScript)
 
-Simple objects with primitive values:
+## Using TOON with LLMs
 
-```ts
-encode({
-  id: 123,
-  name: 'Ada',
-  active: true
-})
-```
+TOON works best when you show the format instead of describing it. The structure is self-documenting – models parse it naturally once they see the pattern. Wrap data in ` ```toon` code blocks for input, and show the expected header template when asking models to generate TOON. Use tab delimiters for even better token efficiency.
 
-```
-id: 123
-name: Ada
-active: true
-```
+Follow the detailed [LLM integration guide](https://toonformat.dev/guide/llm-prompts) for strategies, examples, and validation techniques.
 
-Nested objects:
+## Documentation
 
-```ts
-encode({
-  user: {
-    id: 123,
-    name: 'Ada'
-  }
-})
-```
+Comprehensive guides, references, and resources to help you get the most out of the TOON format and tools.
 
-```
-user:
-  id: 123
-  name: Ada
-```
+**Getting Started**
+- [Introduction & Installation](https://toonformat.dev/guide/getting-started) – What TOON is, when to use it, first steps
+- [Format Overview](https://toonformat.dev/guide/format-overview) – Complete syntax with examples
+- [Benchmarks](https://toonformat.dev/guide/benchmarks) – Accuracy & token efficiency results
 
-### Key Folding (Optional)
+**Tools & Integration**
+- [CLI](https://toonformat.dev/cli/) – Command-line tool for  JSON↔TOON conversions
+- [Using TOON with LLMs](https://toonformat.dev/guide/llm-prompts) – Prompting strategies & validation
+- [Playgrounds](https://toonformat.dev/ecosystem/tools-and-playgrounds) – Interactive tools
 
-New in spec v1.5: Optionally collapse single-key wrapper chains into dotted paths to reduce tokens. Enable with `keyFolding: 'safe'`.
-
-Standard nesting:
-
-```
-data:
-  metadata:
-    items[2]: a,b
-```
-
-With key folding:
-
-```
-data.metadata.items[2]: a,b
-```
-
-Round-trip with path expansion:
-
-```ts
-import { decode, encode } from '@toon-format/toon'
-
-const original = { data: { metadata: { items: ['a', 'b'] } } }
-
-const toon = encode(original, { keyFolding: 'safe' })
-// → "data.metadata.items[2]: a,b"
-
-const restored = decode(toon, { expandPaths: 'safe' })
-// → Matches original structure
-```
-
-See §13.4 in the [specification](https://github.com/toon-format/spec/blob/main/SPEC.md#134-key-folding-and-path-expansion) for folding rules and safety guarantees.
-
-### Arrays
-
-> [!TIP]
-> TOON includes the array length in brackets (e.g., `items[3]`). When using comma delimiters (default), the delimiter is implicit. When using tab or pipe delimiters, the delimiter is explicitly shown in the header (e.g., `tags[2|]` or `[2	]`). This encoding helps LLMs identify the delimiter and track the number of elements, reducing errors when generating or validating structured output.
-
-#### Primitive Arrays (Inline)
-
-```ts
-encode({
-  tags: ['admin', 'ops', 'dev']
-})
-```
-
-```
-tags[3]: admin,ops,dev
-```
-
-#### Arrays of Objects (Tabular)
-
-When all objects share the same primitive fields, TOON uses an efficient **tabular format**:
-
-```ts
-encode({
-  items: [
-    { sku: 'A1', qty: 2, price: 9.99 },
-    { sku: 'B2', qty: 1, price: 14.5 }
-  ]
-})
-```
-
-```
-items[2]{sku,qty,price}:
-  A1,2,9.99
-  B2,1,14.5
-```
-
-**Tabular formatting applies recursively:** nested arrays of objects (whether as object properties or inside list items) also use tabular format if they meet the same requirements.
-
-```ts
-encode({
-  items: [
-    {
-      users: [
-        { id: 1, name: 'Ada' },
-        { id: 2, name: 'Bob' }
-      ],
-      status: 'active'
-    }
-  ]
-})
-```
-
-```
-items[1]:
-  - users[2]{id,name}:
-    1,Ada
-    2,Bob
-    status: active
-```
-
-> [!NOTE]
-> Tabular format requires identical field sets across all objects (same keys, order doesn't matter) and primitive values only (strings, numbers, booleans, null).
-
-#### Mixed and Non-Uniform Arrays
-
-Arrays that don't meet the tabular requirements use list format:
-
-```
-items[3]:
-  - 1
-  - a: 1
-  - text
-```
-
-When objects appear in list format, the first field is placed on the hyphen line:
-
-```
-items[2]:
-  - id: 1
-    name: First
-  - id: 2
-    name: Second
-    extra: true
-```
-
-> [!NOTE]
-> **Nested array indentation:** When the first field of a list item is an array (primitive, tabular, or nested), its contents are indented two spaces under the header line, and subsequent fields of the same object appear at that same indentation level. This remains unambiguous because list items begin with `"- "`, tabular arrays declare a fixed row count in their header, and object fields contain `":"`.
-
-#### Arrays of Arrays
-
-When you have arrays containing primitive inner arrays:
-
-```ts
-encode({
-  pairs: [
-    [1, 2],
-    [3, 4]
-  ]
-})
-```
-
-```
-pairs[2]:
-  - [2]: 1,2
-  - [2]: 3,4
-```
-
-#### Empty Arrays and Objects
-
-Empty containers have special representations:
-
-```ts
-encode({ items: [] }) // items[0]:
-encode([]) // [0]:
-encode({}) // (empty output)
-encode({ config: {} }) // config:
-```
-
-### Quoting Rules
-
-TOON quotes strings **only when necessary** to maximize token efficiency:
-
-- Inner spaces are allowed; leading or trailing spaces force quotes.
-- Unicode and emoji are safe unquoted.
-- Quotes and control characters are escaped with backslash.
-
-> [!NOTE]
-> When using alternative delimiters (tab or pipe), the quoting rules adapt automatically. Strings containing the active delimiter will be quoted, while other delimiters remain safe.
-
-#### Object Keys and Field Names
-
-Keys are unquoted if they match the identifier pattern: start with a letter or underscore, followed by letters, digits, underscores, or dots (e.g., `id`, `userName`, `user_name`, `user.name`, `_private`). All other keys must be quoted (e.g., `"user name"`, `"order-id"`, `"123"`, `"order:id"`, `""`).
-
-#### String Values
-
-String values are quoted when any of the following is true:
-
-| Condition | Examples |
-|---|---|
-| Empty string | `""` |
-| Leading or trailing spaces | `" padded "`, `"  "` |
-| Contains active delimiter, colon, quote, backslash, or control chars | `"a,b"` (comma), `"a\tb"` (tab), `"a\|b"` (pipe), `"a:b"`, `"say \"hi\""`, `"C:\\Users"`, `"line1\\nline2"` |
-| Looks like boolean/number/null | `"true"`, `"false"`, `"null"`, `"42"`, `"-3.14"`, `"1e-6"`, `"05"` |
-| Starts with `"- "` (list-like) | `"- item"` |
-| Looks like structural token | `"[5]"`, `"{key}"`, `"[3]: x,y"` |
-
-**Examples of unquoted strings:** Unicode and emoji are safe (`hello 👋 world`), as are strings with inner spaces (`hello world`).
-
-> [!IMPORTANT]
-> **Delimiter-aware quoting:** Unquoted strings never contain `:` or the active delimiter. This makes TOON reliably parseable with simple heuristics: split key/value on first `: `, and split array values on the delimiter declared in the array header. When using tab or pipe delimiters, commas don't need quoting – only the active delimiter triggers quoting for both array values and object values.
-
-### Type Conversions
-
-Some non-JSON types are automatically normalized for LLM-safe output:
-
-| Input | Output |
-|---|---|
-| Number (finite) | Decimal form, no scientific notation (e.g., `-0` → `0`, `1e6` → `1000000`) |
-| Number (`NaN`, `±Infinity`) | `null` |
-| `BigInt` | If within safe integer range: converted to number. Otherwise: quoted decimal string (e.g., `"9007199254740993"`) |
-| `Date` | ISO string in quotes (e.g., `"2025-01-01T00:00:00.000Z"`) |
-| `undefined` | `null` |
-| `function` | `null` |
-| `symbol` | `null` |
-
-## API
-
-### `encode(value: unknown, options?: EncodeOptions): string`
-
-Converts any JSON-serializable value to TOON format.
-
-**Parameters:**
-
-- `value` – Any JSON-serializable value (object, array, primitive, or nested structure). Non-JSON-serializable values (functions, symbols, undefined, non-finite numbers) are converted to `null`. Dates are converted to ISO strings, and BigInts are emitted as decimal integers (no quotes).
-- `options` – Optional encoding options:
-  - `indent?: number` – Number of spaces per indentation level (default: `2`)
-  - `delimiter?: ',' | '\t' | '|'` – Delimiter for array values and tabular rows (default: `','`)
-  - `keyFolding?: 'off' | 'safe'` – Enable key folding to collapse single-key wrapper chains into dotted paths (default: `'off'`). When `'safe'`, only valid identifier segments are folded
-  - `flattenDepth?: number` – Maximum number of segments to fold when `keyFolding` is enabled (default: `Infinity`). Values 0-1 have no practical effect
-
-**Returns:**
-
-A TOON-formatted string with no trailing newline or spaces.
-
-**Example:**
-
-```ts
-import { encode } from '@toon-format/toon'
-
-const items = [
-  { sku: 'A1', qty: 2, price: 9.99 },
-  { sku: 'B2', qty: 1, price: 14.5 }
-]
-
-encode({ items })
-```
-
-**Output:**
-
-```
-items[2]{sku,qty,price}:
-  A1,2,9.99
-  B2,1,14.5
-```
-
-#### Delimiter Options
-
-The `delimiter` option allows you to choose between comma (default), tab, or pipe delimiters for array values and tabular rows. Alternative delimiters can provide additional token savings in specific contexts.
-
-##### Tab Delimiter (`\t`)
-
-Using tab delimiters instead of commas can reduce token count further, especially for tabular data:
-
-```ts
-const data = {
-  items: [
-    { sku: 'A1', name: 'Widget', qty: 2, price: 9.99 },
-    { sku: 'B2', name: 'Gadget', qty: 1, price: 14.5 }
-  ]
-}
-
-encode(data, { delimiter: '\t' })
-```
-
-**Output:**
-
-```
-items[2	]{sku	name	qty	price}:
-  A1	Widget	2	9.99
-  B2	Gadget	1	14.5
-```
-
-**Benefits:**
-
-- Tabs are single characters and often tokenize more efficiently than commas.
-- Tabs rarely appear in natural text, reducing the need for quote-escaping.
-- The delimiter is explicitly encoded in the array header, making it self-descriptive.
-
-**Considerations:**
-
-- Some terminals and editors may collapse or expand tabs visually.
-- String values containing tabs will still require quoting.
-
-##### Pipe Delimiter (`|`)
-
-Pipe delimiters offer a middle ground between commas and tabs:
-
-```ts
-encode(data, { delimiter: '|' })
-```
-
-**Output:**
-
-```
-items[2|]{sku|name|qty|price}:
-  A1|Widget|2|9.99
-  B2|Gadget|1|14.5
-```
-
-### `decode(input: string, options?: DecodeOptions): JsonValue`
-
-Converts a TOON-formatted string back to JavaScript values.
-
-**Parameters:**
-
-- `input` – A TOON-formatted string to parse
-- `options` – Optional decoding options:
-  - `indent?: number` – Expected number of spaces per indentation level (default: `2`)
-  - `strict?: boolean` – Enable strict validation (default: `true`)
-  - `expandPaths?: 'off' | 'safe'` – Enable path expansion to reconstruct dotted keys into nested objects (default: `'off'`). Pairs with `keyFolding: 'safe'` for lossless round-trips
-
-**Returns:**
-
-A JavaScript value (object, array, or primitive) representing the parsed TOON data.
-
-**Example:**
-
-```ts
-import { decode } from '@toon-format/toon'
-
-const toon = `
-items[2]{sku,qty,price}:
-  A1,2,9.99
-  B2,1,14.5
-`
-
-const data = decode(toon)
-// {
-//   items: [
-//     { sku: 'A1', qty: 2, price: 9.99 },
-//     { sku: 'B2', qty: 1, price: 14.5 }
-//   ]
-// }
-```
-
-**Strict Mode:**
-
-By default, the decoder validates input strictly:
-
-- **Invalid escape sequences**: Throws on `"\x"`, unterminated strings.
-- **Syntax errors**: Throws on missing colons, malformed headers.
-- **Array length mismatches**: Throws when declared length doesn't match actual count.
-- **Delimiter mismatches**: Throws when row delimiters don't match header.
-
-## Using TOON in LLM Prompts
-
-TOON works best when you show the format instead of describing it. The structure is self-documenting – models parse it naturally once they see the pattern.
-
-### Sending TOON to LLMs (Input)
-
-Wrap your encoded data in a fenced code block (label it \`\`\`toon for clarity). The indentation and headers are usually enough – models treat it like familiar YAML or CSV. The explicit array lengths (`[N]`) and field headers (`{field1,field2}`) help the model track structure, especially for large tables.
-
-### Generating TOON from LLMs (Output)
-
-For output, be more explicit. When you want the model to **generate** TOON:
-
-- **Show the expected header** (`users[N]{id,name,role}:`). The model fills rows instead of repeating keys, reducing generation errors.
-- **State the rules:** 2-space indent, no trailing spaces, `[N]` matches row count.
-
-Here's a prompt that works for both reading and generating:
-
-````
-Data is in TOON format (2-space indent, arrays show length and fields).
-
-```toon
-users[3]{id,name,role,lastLogin}:
-  1,Alice,admin,2025-01-15T10:30:00Z
-  2,Bob,user,2025-01-14T15:22:00Z
-  3,Charlie,user,2025-01-13T09:45:00Z
-```
-
-Task: Return only users with role "user" as TOON. Use the same header. Set [N] to match the row count. Output only the code block.
-````
-
-> [!TIP]
-> For large uniform tables, use `encode(data, { delimiter: '\t' })` and tell the model "fields are tab-separated." Tabs often tokenize better than commas and reduce the need for quote-escaping.
-
-## Syntax Cheatsheet
-
-<details>
-<summary><strong>Show format examples</strong></summary>
-
-```
-// Object
-{ id: 1, name: 'Ada' }          → id: 1
-                                  name: Ada
-
-// Nested object
-{ user: { id: 1 } }             → user:
-                                    id: 1
-
-// Primitive array (inline)
-{ tags: ['foo', 'bar'] }        → tags[2]: foo,bar
-
-// Tabular array (uniform objects)
-{ items: [                      → items[2]{id,qty}:
-  { id: 1, qty: 5 },                1,5
-  { id: 2, qty: 3 }                 2,3
-]}
-
-// Mixed / non-uniform (list)
-{ items: [1, { a: 1 }, 'x'] }   → items[3]:
-                                    - 1
-                                    - a: 1
-                                    - x
-
-// Array of arrays
-{ pairs: [[1, 2], [3, 4]] }     → pairs[2]:
-                                    - [2]: 1,2
-                                    - [2]: 3,4
-
-// Root array
-['x', 'y']                      → [2]: x,y
-
-// Empty containers
-{}                              → (empty output)
-{ items: [] }                   → items[0]:
-
-// Special quoting
-{ note: 'hello, world' }        → note: "hello, world"
-{ items: ['true', true] }       → items[2]: "true",true
-```
-
-</details>
+**Reference**
+- [API Reference](https://toonformat.dev/reference/api) – TypeScript/JavaScript encode/decode API
+- [Syntax Cheatsheet](https://toonformat.dev/reference/syntax-cheatsheet) – Quick format lookup
+- [Specification v2.0](https://github.com/toon-format/spec/blob/main/SPEC.md) – Normative rules for implementers
 
 ## Other Implementations
 
@@ -1321,7 +838,7 @@ Task: Return only users with role "user" as TOON. Use the same header. Set [N] t
 
 - **.NET:** [toon_format](https://github.com/toon-format/toon-dotnet) *(in development)*
 - **Dart:** [toon](https://github.com/toon-format/toon-dart) *(in development)*
-- **Go:** [gotoon](https://github.com/toon-format/toon-go) *(in development)*
+- **Go:** [toon-go](https://github.com/toon-format/toon-go) *(in development)*
 - **Python:** [toon_format](https://github.com/toon-format/toon-python) *(in development)*
 - **Rust:** [toon_format](https://github.com/toon-format/toon-rust) *(in development)*
 
@@ -1334,10 +851,12 @@ Task: Return only users with role "user" as TOON. Use the same header. Set [N] t
 - **Gleam:** [toon_codec](https://github.com/axelbellec/toon_codec)
 - **Go:** [gotoon](https://github.com/alpkeskin/gotoon)
 - **Java:** [JToon](https://github.com/felipestanzani/JToon)
+- **Julia:** [ToonFormat.jl](https://github.com/abdelrahman-tolba-software-developer/ToonFormat.jl)
 - **Scala:** [toon4s](https://github.com/vim89/toon4s)
 - **Lua/Neovim:** [toon.nvim](https://github.com/thalesgelinger/toon.nvim)
 - **OCaml:** [ocaml-toon](https://github.com/davesnx/ocaml-toon)
 - **PHP:** [toon-php](https://github.com/HelgeSverre/toon-php)
+- **Laravel Framework:** [laravel-toon](https://github.com/jobmetric/laravel-toon)
 - **R**: [toon](https://github.com/laresbernardo/toon)
 - **Ruby:** [toon-ruby](https://github.com/andrepcg/toon-ruby)
 - **Swift:** [TOONEncoder](https://github.com/mattt/TOONEncoder)
